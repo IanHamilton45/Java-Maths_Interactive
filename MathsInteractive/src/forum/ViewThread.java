@@ -1,0 +1,401 @@
+//Author: Johnathan Evans
+package forum;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
+/**
+ * ViewThread.java - A JPanel that allows the view of a thread and its posts.
+ * @author Johnathan Evans
+ * @version 1.3
+ */
+public class ViewThread extends javax.swing.JPanel {
+    private int threadId;
+    private ForumMain parentPanel;
+    private ForumThread thread;
+    private ArrayList<ForumPost> posts;
+    private DBAccess db = new DBAccess();
+    /**
+     * Assigns variables and creates the panel content
+     * @param threadId
+     * @param parentPanel
+     */
+    public ViewThread(int threadId, ForumMain parentPanel) {
+        this.threadId = threadId;
+        this.parentPanel = parentPanel;
+        initComponents();
+        retrieveThreadData();
+        retrievePosts();
+        generateThread();
+        generatePosts(parentPanel);
+    }
+    
+    /**
+     * Generates the content on the JPanel
+     */
+    public void generateThread() {
+        username.setText(thread.getFullName()); //Sets the thread user full name
+        date.setText(thread.getDate()); //Sets the thread date
+        
+        if(parentPanel.currentUser.getUserLevel().equals("ADMIN")) {
+            adminSettings();
+        } else if(parentPanel.currentUser.getUserId() == thread.getUserId()) {
+            ownerSettings();
+        } else {
+            defaultSettings();
+        }
+    }
+    
+    /**
+     * Generates the thread posts by looping through the array of ForumPost and adding them to the panel
+     * @param parentPanel
+     */
+    public void generatePosts(ForumMain parentPanel) {
+        posts.forEach((p)->panelPosts.add(new PanelPost(parentPanel, p), BorderLayout.CENTER));
+    }
+    
+    private void ownerSettings() {
+        reportThread.setVisible(false);
+        approveThread.setVisible(false);
+        if(thread.getFlagged() == 1) {
+            replyThreadBtn.setVisible(false);
+            labelTitle.setForeground(Color.red);
+            labelTitle.setText("Awaiting admin review!");
+            textContent.setForeground(Color.red);
+            textContent.setText("Content removed until an admin review the thread!");
+        } else {
+            labelTitle.setText(thread.getTitle());
+            textContent.setText(thread.getContent());
+        }
+    }
+    
+    private void adminSettings() {
+        reportThread.setVisible(false);
+        editThread.setVisible(false);
+        reportThread.setVisible(false);
+        approveThread.setVisible(false);
+        if(thread.getFlagged() == 1) {
+            replyThreadBtn.setVisible(false);
+            labelTitle.setText(thread.getTitle());
+            textContent.setBackground(Color.red);
+            textContent.setText(thread.getContent());
+            approveThread.setVisible(true);
+        } else {
+            labelTitle.setText(thread.getTitle());
+            textContent.setText(thread.getContent());
+        }
+    }
+    
+    private void defaultSettings() {
+        editThread.setVisible(false);
+        deleteThread.setVisible(false);
+        approveThread.setVisible(false);
+        if(thread.getFlagged() == 1) {
+            replyThreadBtn.setVisible(false);
+            reportThread.setVisible(false);
+            labelTitle.setForeground(Color.red);
+            labelTitle.setText("Awaiting admin review!");
+            textContent.setForeground(Color.red);
+            textContent.setText("Content removed until an admin review the thread!");
+        } else {
+            labelTitle.setText(thread.getTitle());
+            textContent.setText(thread.getContent());
+        }
+    }
+    
+    /**
+     * Retrieves the thread date using the database function
+     */
+    private void retrieveThreadData() {
+        DBAccess database = new DBAccess();
+        thread = database.getThread(threadId);
+    }
+    
+    /**
+     * Retrieves the thread posts using the database function to return an array of ForumPost objects
+     */
+     private void retrievePosts() {
+        DBAccess db = new DBAccess();
+        posts = db.getThreadPosts(threadId);
+    }
+     
+    /**
+     * Reports the thread using the database function to flag the thread in the database
+     */
+    private void reportThread() {
+        db.reportThread(thread.getThreadId());
+        parentPanel.openBoard();
+    }
+    
+    public void deleteThread() {
+        db.removeThread(thread.getThreadId()); //Removes the post in the database
+        parentPanel.openBoard(); //Redirects the user back to the forum
+    }
+    
+    private void approveThread() {
+        db.approveThread(thread.getThreadId());
+        parentPanel.openThread(thread.getThreadId()); //Redirects the user back to the thread
+    }
+    
+    private void editThread() {
+        parentPanel.openEditThread(thread);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        panelHeader = new javax.swing.JPanel();
+        labelTitle = new javax.swing.JLabel();
+        panelContent = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        username = new javax.swing.JLabel();
+        date = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        reportThread = new javax.swing.JLabel();
+        deleteThread = new javax.swing.JLabel();
+        approveThread = new javax.swing.JLabel();
+        editThread = new javax.swing.JLabel();
+        replyThreadBtn = new javax.swing.JButton();
+        textContent = new javax.swing.JTextArea();
+        panelPosts = new javax.swing.JPanel();
+
+        panelHeader.setBackground(new java.awt.Color(255, 255, 255));
+
+        labelTitle.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        labelTitle.setText("Example Title");
+
+        javax.swing.GroupLayout panelHeaderLayout = new javax.swing.GroupLayout(panelHeader);
+        panelHeader.setLayout(panelHeaderLayout);
+        panelHeaderLayout.setHorizontalGroup(
+            panelHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelHeaderLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(labelTitle)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panelHeaderLayout.setVerticalGroup(
+            panelHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelHeaderLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelTitle)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        labelTitle.getAccessibleContext().setAccessibleName("labelTitle");
+
+        panelContent.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        username.setText("Example Username");
+
+        date.setText("Example Date");
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/forum/user.png"))); // NOI18N
+
+        reportThread.setForeground(new java.awt.Color(255, 0, 0));
+        reportThread.setText("Report Thread");
+        reportThread.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        reportThread.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                reportThreadMouseReleased(evt);
+            }
+        });
+
+        deleteThread.setForeground(new java.awt.Color(255, 0, 0));
+        deleteThread.setText("Delete");
+        deleteThread.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        deleteThread.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                deleteThreadMouseReleased(evt);
+            }
+        });
+
+        approveThread.setForeground(new java.awt.Color(0, 215, 0));
+        approveThread.setText("Approve");
+        approveThread.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        approveThread.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                approveThreadMouseReleased(evt);
+            }
+        });
+
+        editThread.setText("Edit Thread");
+        editThread.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        editThread.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                editThreadMouseReleased(evt);
+            }
+        });
+
+        replyThreadBtn.setText("Reply");
+        replyThreadBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                replyThreadBtnMouseReleased(evt);
+            }
+        });
+        replyThreadBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                replyThreadBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(editThread)
+                .addGap(15, 15, 15)
+                .addComponent(jLabel2)
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(username)
+                    .addComponent(date)
+                    .addComponent(reportThread))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(approveThread)
+                        .addGap(18, 18, 18)
+                        .addComponent(deleteThread))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(replyThreadBtn)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(editThread))
+            .addComponent(jLabel2)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(username)
+                .addGap(6, 6, 6)
+                .addComponent(date)
+                .addGap(6, 6, 6)
+                .addComponent(reportThread))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(replyThreadBtn)
+                .addGap(26, 26, 26)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(deleteThread)
+                    .addComponent(approveThread))
+                .addContainerGap())
+        );
+
+        textContent.setEditable(false);
+        textContent.setColumns(1);
+        textContent.setLineWrap(true);
+        textContent.setRows(5);
+        textContent.setWrapStyleWord(true);
+
+        javax.swing.GroupLayout panelContentLayout = new javax.swing.GroupLayout(panelContent);
+        panelContent.setLayout(panelContentLayout);
+        panelContentLayout.setHorizontalGroup(
+            panelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelContentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textContent)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelContentLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        panelContentLayout.setVerticalGroup(
+            panelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelContentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(textContent, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
+        );
+
+        panelPosts.setLayout(new javax.swing.BoxLayout(panelPosts, javax.swing.BoxLayout.Y_AXIS));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelHeader, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panelContent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panelPosts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(panelHeader, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelContent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelPosts, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void replyThreadBtnMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_replyThreadBtnMouseReleased
+        parentPanel.openCreatePost(thread.getThreadId());
+    }//GEN-LAST:event_replyThreadBtnMouseReleased
+
+    private void reportThreadMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reportThreadMouseReleased
+        int reportAnswer = JOptionPane.showConfirmDialog(this, "Are you sure you want to report the post?", "Warning", JOptionPane.YES_NO_OPTION);
+        if(reportAnswer == JOptionPane.YES_OPTION){
+            reportThread();
+        }
+    }//GEN-LAST:event_reportThreadMouseReleased
+
+    private void approveThreadMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_approveThreadMouseReleased
+        int approveAnswer = JOptionPane.showConfirmDialog(this, "Are you sure you want to approve the post?", "Warning", JOptionPane.YES_NO_OPTION);
+        if(approveAnswer == JOptionPane.YES_OPTION){
+            approveThread();
+        }
+    }//GEN-LAST:event_approveThreadMouseReleased
+
+    private void editThreadMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editThreadMouseReleased
+        editThread();
+    }//GEN-LAST:event_editThreadMouseReleased
+
+    private void deleteThreadMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteThreadMouseReleased
+        int deleteAnswer = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the post?", "Warning", JOptionPane.YES_NO_OPTION);
+        if(deleteAnswer == JOptionPane.YES_OPTION){
+            deleteThread();
+        }
+    }//GEN-LAST:event_deleteThreadMouseReleased
+
+    private void replyThreadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replyThreadBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_replyThreadBtnActionPerformed
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel approveThread;
+    private javax.swing.JLabel date;
+    private javax.swing.JLabel deleteThread;
+    private javax.swing.JLabel editThread;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel labelTitle;
+    private javax.swing.JPanel panelContent;
+    private javax.swing.JPanel panelHeader;
+    private javax.swing.JPanel panelPosts;
+    private javax.swing.JButton replyThreadBtn;
+    private javax.swing.JLabel reportThread;
+    private javax.swing.JTextArea textContent;
+    private javax.swing.JLabel username;
+    // End of variables declaration//GEN-END:variables
+}
